@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <style>
+        body {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to bottom right, #ffcccc, #cc99ff);
+        }
+
+        .calculator {
+            max-width: 200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #cc99ff;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        #result {
+            width: 100%;
+            height: 50px;
+            margin-bottom: 10px;
+            font-size: 24px;
+            border: none;
+            background-color: white;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 5px;
+        }
+
+        button {
+            width: 100%;
+            height: 50px;
+            font-size: 18px;
+            background-color: #ffcccc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #ffccff;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" name="result" id="result" disabled>
+        <div class="buttons">
+            <button onclick="appendToExpression('7')">7</button>
+            <button onclick="appendToExpression('8')">8</button>
+            <button onclick="appendToExpression('9')">9</button>
+            <button onclick="appendToExpression('/')">/</button>
+            <button onclick="appendToExpression('4')">4</button>
+            <button onclick="appendToExpression('5')">5</button>
+            <button onclick="appendToExpression('6')">6</button>
+            <button onclick="appendToExpression('*')">x</button>
+            <button onclick="appendToExpression('1')">1</button>
+            <button onclick="appendToExpression('2')">2</button>
+            <button onclick="appendToExpression('3')">3</button>
+            <button onclick="appendToExpression('-')">-</button>
+            <button onclick="appendToExpression('0')">0</button>
+            <button onclick="appendToExpression('.')">.</button>
+            <button onclick="appendToExpression('+')">+</button>
+            <button onclick="deleteLast()">DEL</button>
+            <button onclick="clearExpression()">C</button>
+            <button onclick="calculateResult()">=</button>
+        </div>
+    </div>
+
+    <script>
+        function appendToExpression(value) {
+            document.getElementById('result').value += value;
+        }
+
+        function clearExpression() {
+            document.getElementById('result').value = '';
+        }
+
+
+        function deleteLast() {
+            let expression = document.getElementById('result').value;
+            document.getElementById('result').value = expression.slice(0, -1);
+        }
+
+
+
+        function calculateResult() {
+            let expression = document.getElementById('result').value;
+            if (expression.trim() === '') {
+                alert('Expression is empty');
+                return;
+            }
+
+            fetch('balls.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    expression: expression,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    document.getElementById('result').value = data.result;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while calculating the result.');
+            });
+        }
+    </script>
+</body>
+</html>
